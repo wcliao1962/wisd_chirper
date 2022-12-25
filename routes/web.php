@@ -21,7 +21,7 @@ Route::get('/', function () {
 });
 Route::get('/test', function () {
     return 'pass';
-}) ->middleware(EnsureTokenIsValid::class);
+}) ->middleware('test');
 
 
 Route::get('/dashboard', function () {
