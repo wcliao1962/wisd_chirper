@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ChirpCreated;
 use App\Models\Chirp;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ChirpController extends Controller
 {
@@ -47,7 +50,7 @@ class ChirpController extends Controller
         ]);
         //dd($validated);
         //dd($request->user()->id);
-        $request->user()->chirps()->create($validated);
+        $chirp=$request->user()->chirps()->create($validated);
 
 // 其他儲存方式
 //       auth()->user()->chirps()->create($validated);
@@ -61,7 +64,9 @@ class ChirpController extends Controller
 //            'user_id' => $request->user()->id,
 //            'message' => $validated['message'],
 //        ]);
-
+        foreach (User::whereNot('id', $chirp->user_id)->cursor() as $user) {
+            Mail::to($user)->send(new ChirpCreated($chirp));
+        }
         return redirect(route('chirps.index'));
     }
 
